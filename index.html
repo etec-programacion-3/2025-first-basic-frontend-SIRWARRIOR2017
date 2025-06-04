@@ -278,10 +278,10 @@
         <!-- Formulario para crear o actualizar producto -->
 
         <!-- Modificar el formulario -->
-        <form id="form-producto" class="compact-form mb-3">
+        <form id="form-libro" class="compact-form mb-3">
             <div class="col">
-                <label class="form-label">Nombre del Libro</label>
-                <input type="text" id="nombre" class="form-control input-large" required>
+                <label class="form-label">Título del Libro</label>
+                <input type="text" id="titulo" class="form-control input-large" required>
             </div>
 
             <div class="col">
@@ -295,40 +295,45 @@
             </div>
 
             <div class="col">
-                <label class="form-label">Precio</label>
-                <input type="number" id="precio" class="form-control input-large" placeholder="0.00" required step="0.01">
-            </div>
-
-            <div class="col">
                 <label class="form-label">Categoría</label>
                 <select id="categoria" class="form-select input-large" required>
                     <option value="">Seleccionar categoría</option>
-                    <option value="novela">Novela</option>
-                    <option value="ficcion">Ficción</option>
-                    <option value="no-ficcion">No Ficción</option>
-                    <option value="infantil">Infantil</option>
-                    <option value="juvenil">Juvenil</option>
-                    <option value="ciencia">Ciencia</option>
-                    <option value="historia">Historia</option>
-                    <option value="biografia">Biografía</option>
-                    <option value="poesia">Poesía</option>
-                    <option value="drama">Drama</option>
-                    <option value="misterio">Misterio</option>
-                    <option value="romance">Romance</option>
-                    <option value="fantasia">Fantasía</option>
-                    <option value="ciencia-ficcion">Ciencia Ficción</option>
-                    <option value="terror">Terror</option>
-                    <option value="thriller">Thriller</option>
-                    <option value="comic">Cómic</option>
-                    <option value="educacion">Educación</option>
-                    <option value="autoayuda">Autoayuda</option>
-                    <option value="cocina">Cocina</option>
+                    <option value="Novela">Novela</option>
+                    <option value="Ficción">Ficción</option>
+                    <option value="No Ficción">No Ficción</option>
+                    <option value="Infantil">Infantil</option>
+                    <option value="Juvenil">Juvenil</option>
+                    <option value="Ciencia">Ciencia</option>
+                    <option value="Historia">Historia</option>
+                    <option value="Biografía">Biografía</option>
+                    <option value="Poesía">Poesía</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Misterio">Misterio</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Fantasía">Fantasía</option>
+                    <option value="Ciencia Ficción">Ciencia Ficción</option>
+                    <option value="Terror">Terror</option>
+                    <option value="Thriller">Thriller</option>
+                    <option value="Cómic">Cómic</option>
+                    <option value="Educación">Educación</option>
+                    <option value="Autoayuda">Autoayuda</option>
+                    <option value="Cocina">Cocina</option>
                 </select>
             </div>
 
-            <div class="descripcion-field">
-                <label class="form-label">Descripción</label>
-                <textarea id="descripcion" class="form-control" placeholder="Descripción del libro" required></textarea>
+            <div class="col">
+                <label class="form-label">Estado</label>
+                <select id="estado" class="form-select input-large" required>
+                    <option value="disponible">Disponible</option>
+                    <option value="prestado">Prestado</option>
+                    <option value="reservado">Reservado</option>
+                    <option value="vendido">Vendido</option>
+                </select>
+            </div>
+
+            <div class="col" id="personaDiv" style="display:none;">
+                <label class="form-label">Nombre de la persona</label>
+                <input type="text" id="persona" class="form-control input-large" placeholder="Nombre de la persona">
             </div>
 
             <div class="col-12 d-flex gap-2">
@@ -359,7 +364,6 @@
                     <tr>
                         <th>Información</th>
                         <th>Detalles</th>
-                        <th>Precio</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -376,21 +380,21 @@
 
         // Configuración de la API
 
-        const baseUrl = 'http://localhost:8001/api/products';
+        const baseUrl = 'http://localhost:8000/api/libros';
 
         const tabla = document.querySelector('#tabla-productos tbody');
 
-        const form = document.getElementById('form-producto');
+        const form = document.getElementById('form-libro');
 
-        const inputNombre = document.getElementById('nombre');
+        const inputTitulo = document.getElementById('titulo');
 
         const inputAutor = document.getElementById('autor');
 
         const inputIsbn = document.getElementById('isbn');
 
-        const inputPrecio = document.getElementById('precio');
+        const inputCategoria = document.getElementById('categoria');
 
-        const inputDescripcion = document.getElementById('descripcion');
+        const inputEstado = document.getElementById('estado');
 
         const btnCancelar = document.getElementById('btn-cancelar');
 
@@ -398,9 +402,13 @@
 
         const inputBusqueda = document.getElementById('busqueda');
 
+        const inputPersona = document.getElementById('persona');
+
+        const personaDiv = document.getElementById('personaDiv');
+
         let editId = null;
 
-        let todosLosProductos = []; // Almacenar todos los productos
+        let todosLosLibros = [];
 
 
 
@@ -418,23 +426,23 @@
 
         // Obtener todos los productos
 
-        async function cargarProductos() {
+        async function cargarLibros() {
 
-            tabla.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
+            tabla.innerHTML = '<tr><td colspan="4">Cargando...</td></tr>';
 
             try {
 
                 const res = await fetch(baseUrl);
 
-                const productos = await res.json();
+                const libros = await res.json();
 
-                todosLosProductos = productos; // Guardar todos los productos
+                todosLosLibros = libros;
 
-                mostrarProductos(productos);
+                mostrarLibros(libros);
 
             } catch (err) {
 
-                tabla.innerHTML = '<tr><td colspan="7">Error al cargar productos</td></tr>';
+                tabla.innerHTML = '<tr><td colspan="4">Error al cargar libros</td></tr>';
 
             }
 
@@ -443,33 +451,35 @@
 
 
         // Función para mostrar productos en la tabla
-        function mostrarProductos(productos) {
+        function mostrarLibros(libros) {
             tabla.innerHTML = '';
-            const totalLibros = productos.length;
+            const totalLibros = libros.length;
             document.getElementById('totalLibros').textContent = totalLibros;
 
-            productos.forEach(prod => {
+            libros.forEach(libro => {
+                const persona = (['prestado','reservado','vendido'].includes(libro.estado) && libro.prestado_a) ? `<br><span class='badge bg-info'>${libro.prestado_a}</span>` : '';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
-                        <strong>${prod.name}</strong><br>
-                        <small class="text-muted">por ${prod.author || 'Desconocido'}</small><br>
-                        <small>ISBN: ${prod.isbn || 'N/A'}</small>
+                        <strong>${libro.titulo}</strong><br>
+                        <small class="text-muted">por ${libro.autor || 'Desconocido'}</small><br>
+                        <small>ISBN: ${libro.isbn || 'N/A'}</small>
                     </td>
                     <td>
-                        <span class="badge bg-primary">${prod.categoria || 'Sin categoría'}</span><br>
-                        <small>${prod.description}</small>
+                        <span class="badge bg-primary">${libro.categoria || 'Sin categoría'}</span><br>
+                        <span class="badge bg-secondary">${libro.estado || 'Sin estado'}</span>${persona}
                     </td>
-                    <td>$${prod.price.toFixed(2)}</td>
                     <td>
                         <button class="btn btn-sm btn-warning me-2" 
-                            onclick="editarProducto(${prod.id}, 
-                            '${prod.name.replace(/'/g, "&#39;")}',
-                            '${(prod.author || '').replace(/'/g, "&#39;")}',
-                            '${(prod.isbn || '').replace(/'/g, "&#39;")}',
-                            ${prod.price}, 
-                            '${prod.description.replace(/'/g, "&#39;")}')">Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${prod.id})">Eliminar</button>
+                            onclick="editarLibro(${libro.id}, 
+                            '${libro.titulo.replace(/'/g, "&#39;")}',
+                            '${(libro.autor || '').replace(/'/g, "&#39;")}',
+                            '${(libro.isbn || '').replace(/'/g, "&#39;")}',
+                            '${(libro.categoria || '').replace(/'/g, "&#39;")}',
+                            '${(libro.estado || '').replace(/'/g, "&#39;")}',
+                            '${(libro.prestado_a || '').replace(/'/g, "&#39;")}'
+                            )">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${libro.id})">Eliminar</button>
                     </td>
                 `;
                 tabla.appendChild(tr);
@@ -479,14 +489,14 @@
 
 
         // Función de búsqueda
-        function filtrarProductos(termino) {
+        function filtrarLibros(termino) {
             const terminoLower = termino.toLowerCase();
-            const productosFiltrados = todosLosProductos.filter(prod => 
-                prod.name.toLowerCase().includes(terminoLower) ||
-                (prod.author && prod.author.toLowerCase().includes(terminoLower)) ||
-                (prod.isbn && prod.isbn.toLowerCase().includes(terminoLower))
+            const librosFiltrados = todosLosLibros.filter(libro => 
+                libro.titulo.toLowerCase().includes(terminoLower) ||
+                (libro.autor && libro.autor.toLowerCase().includes(terminoLower)) ||
+                (libro.isbn && libro.isbn.toLowerCase().includes(terminoLower))
             );
-            mostrarProductos(productosFiltrados);
+            mostrarLibros(librosFiltrados);
         }
 
 
@@ -497,19 +507,25 @@
 
             e.preventDefault();
 
-            const producto = {
+            const libro = {
 
-                name: inputNombre.value.trim(),
+                titulo: inputTitulo.value.trim(),
 
-                author: inputAutor.value.trim(),
+                autor: inputAutor.value.trim(),
 
                 isbn: inputIsbn.value.trim(),
 
-                price: parseFloat(inputPrecio.value),
+                categoria: inputCategoria.value,
 
-                description: inputDescripcion.value.trim()
+                estado: inputEstado.value
 
             };
+
+            if(['prestado','reservado','vendido'].includes(inputEstado.value)) {
+                libro.prestado_a = inputPersona.value.trim();
+            } else {
+                libro.prestado_a = null;
+            }
 
             try {
 
@@ -525,11 +541,11 @@
 
                         headers: { 'Content-Type': 'application/json' },
 
-                        body: JSON.stringify(producto)
+                        body: JSON.stringify(libro)
 
                     });
 
-                    mostrarMensaje('Producto actualizado');
+                    mostrarMensaje('Libro actualizado');
 
                 } else {
 
@@ -541,11 +557,11 @@
 
                         headers: { 'Content-Type': 'application/json' },
 
-                        body: JSON.stringify(producto)
+                        body: JSON.stringify(libro)
 
                     });
 
-                    mostrarMensaje('Producto agregado');
+                    mostrarMensaje('Libro agregado');
 
                 }
 
@@ -557,11 +573,13 @@
 
                 btnCancelar.classList.add('d-none');
 
-                cargarProductos();
+                personaDiv.style.display = 'none';
+
+                cargarLibros();
 
             } catch (err) {
 
-                mostrarMensaje('Error al guardar producto', 'danger');
+                mostrarMensaje('Error al guardar libro', 'danger');
 
             }
 
@@ -571,19 +589,29 @@
 
         // Editar producto (rellena el formulario)
 
-        window.editarProducto = function (id, nombre, autor, isbn, precio, descripcion) {
+        window.editarLibro = function (id, titulo, autor, isbn, categoria, estado, prestado_a) {
 
             editId = id;
 
-            inputNombre.value = nombre;
+            inputTitulo.value = titulo;
 
             inputAutor.value = autor || '';
 
             inputIsbn.value = isbn || '';
 
-            inputPrecio.value = precio;
+            inputCategoria.value = categoria || '';
 
-            inputDescripcion.value = descripcion;
+            inputEstado.value = estado || 'disponible';
+
+            if(['prestado','reservado','vendido'].includes(estado)) {
+                personaDiv.style.display = '';
+                inputPersona.value = prestado_a || '';
+                inputPersona.required = true;
+            } else {
+                personaDiv.style.display = 'none';
+                inputPersona.value = '';
+                inputPersona.required = false;
+            }
 
             btnCancelar.classList.remove('d-none');
 
@@ -607,9 +635,9 @@
 
         // Eliminar producto
 
-        window.eliminarProducto = async function (id) {
+        window.eliminarLibro = async function (id) {
 
-            if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
+            if (!confirm('¿Seguro que deseas eliminar este libro?')) return;
 
             try {
 
@@ -617,13 +645,13 @@
 
                 if (!res.ok) throw new Error('Error al eliminar');
 
-                mostrarMensaje('Producto eliminado');
+                mostrarMensaje('Libro eliminado');
 
-                cargarProductos();
+                cargarLibros();
 
             } catch (err) {
 
-                mostrarMensaje('Error al eliminar producto', 'danger');
+                mostrarMensaje('Error al eliminar libro', 'danger');
 
             }
 
@@ -633,7 +661,7 @@
 
         // Cargar productos al iniciar
 
-        cargarProductos();
+        cargarLibros();
 
 
 
@@ -641,7 +669,7 @@
 
         inputBusqueda.addEventListener('input', (e) => {
 
-            filtrarProductos(e.target.value);
+            filtrarLibros(e.target.value);
 
         });
 
@@ -653,33 +681,35 @@
         });
 
         // Modificar la función mostrarProductos
-        function mostrarProductos(productos) {
+        function mostrarLibros(libros) {
             tabla.innerHTML = '';
-            const totalLibros = productos.length;
+            const totalLibros = libros.length;
             document.getElementById('totalLibros').textContent = totalLibros;
 
-            productos.forEach(prod => {
+            libros.forEach(libro => {
+                const persona = (['prestado','reservado','vendido'].includes(libro.estado) && libro.prestado_a) ? `<br><span class='badge bg-info'>${libro.prestado_a}</span>` : '';
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>
-                        <strong>${prod.name}</strong><br>
-                        <small class="text-muted">por ${prod.author || 'Desconocido'}</small><br>
-                        <small>ISBN: ${prod.isbn || 'N/A'}</small>
+                        <strong>${libro.titulo}</strong><br>
+                        <small class="text-muted">por ${libro.autor || 'Desconocido'}</small><br>
+                        <small>ISBN: ${libro.isbn || 'N/A'}</small>
                     </td>
                     <td>
-                        <span class="badge bg-primary">${prod.categoria || 'Sin categoría'}</span><br>
-                        <small>${prod.description}</small>
+                        <span class="badge bg-primary">${libro.categoria || 'Sin categoría'}</span><br>
+                        <span class="badge bg-secondary">${libro.estado || 'Sin estado'}</span>${persona}
                     </td>
-                    <td>$${prod.price.toFixed(2)}</td>
                     <td>
                         <button class="btn btn-sm btn-warning me-2" 
-                            onclick="editarProducto(${prod.id}, 
-                            '${prod.name.replace(/'/g, "&#39;")}',
-                            '${(prod.author || '').replace(/'/g, "&#39;")}',
-                            '${(prod.isbn || '').replace(/'/g, "&#39;")}',
-                            ${prod.price}, 
-                            '${prod.description.replace(/'/g, "&#39;")}')">Editar</button>
-                        <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${prod.id})">Eliminar</button>
+                            onclick="editarLibro(${libro.id}, 
+                            '${libro.titulo.replace(/'/g, "&#39;")}',
+                            '${(libro.autor || '').replace(/'/g, "&#39;")}',
+                            '${(libro.isbn || '').replace(/'/g, "&#39;")}',
+                            '${(libro.categoria || '').replace(/'/g, "&#39;")}',
+                            '${(libro.estado || '').replace(/'/g, "&#39;")}',
+                            '${(libro.prestado_a || '').replace(/'/g, "&#39;")}'
+                            )">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarLibro(${libro.id})">Eliminar</button>
                     </td>
                 `;
                 tabla.appendChild(tr);
@@ -691,7 +721,7 @@
             const categoria = document.getElementById('filterCategoria').value;
             const precio = document.getElementById('filterPrecio').value;
 
-            let productosFiltrados = todosLosProductos;
+            let productosFiltrados = todosLosLibros;
 
             if (categoria) {
                 productosFiltrados = productosFiltrados.filter(p => p.categoria === categoria);
@@ -707,7 +737,7 @@
                 });
             }
 
-            mostrarProductos(productosFiltrados);
+            mostrarLibros(productosFiltrados);
         }
     </script>
 
